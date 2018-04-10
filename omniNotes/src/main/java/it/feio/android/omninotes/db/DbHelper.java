@@ -973,6 +973,81 @@ public class DbHelper extends SQLiteOpenHelper {
 
 
     /**
+     * Retrieves statistics data for a single note
+     */
+    public Stats getStatsSingleNote(Note note) {
+        StatsSingleNote mStats = new StatsSingleNote();
+
+        int words, chars;
+		if (note.isChecklist()) {
+			note.getContent();
+		}
+		if (note.isLocked()) {
+			notesMasked++;
+		}
+		tags += TagsHelper.retrieveTags(note).size();
+		if (note.getLongitude() != null && note.getLongitude() != 0) {
+			locations++;
+		}
+		words = getWords(note);
+		chars = getChars(note);
+		if (words > maxWords) {
+			maxWords = words;
+		}
+		if (chars > maxChars) {
+			maxChars = chars;
+		}
+		totalWords += words;
+		totalChars += chars;
+
+
+        mStats.setNotesActive(notesActive);
+        mStats.setNotesArchived(notesArchived);
+        mStats.setNotesTrashed(notesTrashed);
+        mStats.setReminders(reminders);
+        mStats.setRemindersFutures(remindersFuture);
+        mStats.setNotesChecklist(checklists);
+        mStats.setNotesMasked(notesMasked);
+        mStats.setTags(tags);
+        mStats.setLocation(locations);
+        avgWords = totalWords / (notes.size() != 0 ? notes.size() : 1);
+		avgChars = totalChars / (notes.size() != 0 ? notes.size() : 1);
+
+        mStats.setWords(totalWords);
+        mStats.setWordsMax(maxWords);
+        mStats.setWordsAvg(avgWords);
+        mStats.setChars(totalChars);
+        mStats.setCharsMax(maxChars);
+        mStats.setCharsAvg(avgChars);
+
+        // Everything about attachments
+        int attachmentsAll = 0, images = 0, videos = 0, audioRecordings = 0, sketches = 0, files = 0;
+        List<Attachment> attachments = getAllAttachments();
+        for (Attachment attachment : attachments) {
+            if (Constants.MIME_TYPE_IMAGE.equals(attachment.getMime_type())) {
+                images++;
+            } else if (Constants.MIME_TYPE_VIDEO.equals(attachment.getMime_type())) {
+                videos++;
+            } else if (Constants.MIME_TYPE_AUDIO.equals(attachment.getMime_type())) {
+                audioRecordings++;
+            } else if (Constants.MIME_TYPE_SKETCH.equals(attachment.getMime_type())) {
+                sketches++;
+            } else if (Constants.MIME_TYPE_FILES.equals(attachment.getMime_type())) {
+                files++;
+            }
+        }
+        mStats.setAttachments(attachmentsAll);
+        mStats.setImages(images);
+        mStats.setVideos(videos);
+        mStats.setAudioRecordings(audioRecordings);
+        mStats.setSketches(sketches);
+        mStats.setFiles(files);
+
+        return mStats;
+    }
+
+
+    /**
      * Retrieves statistics data based on app usage
      */
     public Stats getStats() {

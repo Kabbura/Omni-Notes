@@ -1138,6 +1138,9 @@ public class DetailFragment extends BaseFragment implements OnReminderPickedList
 			case R.id.menu_delete:
 				deleteNote();
 				break;
+			case R.id.menu_note_info:
+				showNoteInfo();
+				break;
 			default: Log.w(Constants.TAG, "Invalid menu option selected");
 		}
 
@@ -1146,6 +1149,14 @@ public class DetailFragment extends BaseFragment implements OnReminderPickedList
 		return super.onOptionsItemSelected(item);
 	}
 
+	private void showNoteInfo() {
+		View layout = getActivity().getLayoutInflater().inflate(R.layout.activity_stats_note, null);
+		new MaterialDialog.Builder(mainActivity)
+				.customView(layout, false)
+				.positiveText(R.string.ok)
+				.build()
+				.show();
+	}
 
 	private void navigateUp() {
 		afterSavedReturnsToList = true;
